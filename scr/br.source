@@ -1,0 +1,70 @@
+
+br<-function(y,X,niter=1000,burnin=100,permutation=T)
+{
+    welcome<-function(){
+        cat("===  Naive Bayesian regression with posible permutation analyses=======")
+        cat("\n")
+        cat("#                                                                   #")
+        cat("\n")
+        cat("#                             May, 2021                             #")
+        cat("\n")
+        cat("#                 Contact: gonzalez.oscar@inia.es                   #")
+        cat("\n")
+        cat("#                                                                   #")
+        cat("\n")
+        cat("=====================================================================")
+        cat("\n")
+    }
+    welcome()
+    permuted.data<-sample(1:length(y),length(y))
+    X<-as.matrix(X) #cbind(x1,x2)
+    if (permutation){y<-y[permuted.data]}
+    
+    neq<-dim(X)[2]
+    intercept_hat<-vector(length=niter) #vector donde se guardaran las condicionales del intercepto
+    beta_hat<-matrix(ncol=neq,nrow=niter) #vector donde se guardaran las condicionales del coeficient beta
+    ve<-vector(length=niter) #vector donde se guardaran las condicionales de la varianza residual
+    
+    intercept_hat[1]=runif(1) #valor inicial media (intercepto)
+    beta_hat[1,]<-runif(neq) #valor inicial de beta
+    ve[1]=runif(1) #valor inicial de ve
+    
+    #work with residuals
+    residuals<-y-intercept_hat[1]-X%*%beta_hat[1,]
+    
+    #Empieza Gibbs sampling para muestrear de condicionales
+    for (iter in 2:niter){
+        
+        if (permutation){
+            residuals<-residuals+y[permuted.data]
+            permuted.data<-sample(1:length(y),length(y))
+            residuals<-residuals-y[permuted.data]
+        }
+        
+        #sample from conditional distribution for mu
+        temp<-residuals+intercept_hat[iter-1]
+        intercept_hat[iter]<-rnorm(1,mean=(sum(residuals)+n*intercept_hat[iter-1])/(n),sd = sqrt(ve[1]/(n)))
+        residuals<-temp-intercept_hat[iter]
+        
+        #sample from conditional distribution for beta
+        for (j in 1:neq) {
+            xpx<-sum(X[,j]*X[,j])
+            temp<-residuals+beta_hat[iter-1,j]*X[,j]
+            beta_hat[iter,j]<-rnorm(1,mean=(sum(X[,j]*temp))/(xpx),sd = sqrt(ve[iter-1]/xpx))
+            residuals<-temp-beta_hat[iter,j]*X[,j]
+            
+        }
+        #sample from conditional distribution for residual variance
+        sse<-sum(residuals**2)
+        ve[iter]<-1/rgamma(1,shape=(n)/2,rate =(sse)/2)
+    }
+    
+    
+    
+    out <- list(y = y,niter=niter,burnin=burnin, itcp = intercept_hat, itcp_Hat = mean(intercept_hat[(burnin+1):niter]), beta_pd = beta_hat, 
+                beta_Hat=apply(beta_hat[(burnin+1):niter,],2,mean), ve_Hat=mean(ve[(burnin+1):niter]), ve=ve)
+    names(out$beta_pd) <- colnames(X)
+    names(out$beta_Hat) <- colnames(X)
+    
+    return(out)
+}
