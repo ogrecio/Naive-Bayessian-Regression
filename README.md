@@ -13,14 +13,19 @@ source("scr/getOverlapping.source")
 Simulate data
 ```r 
 n=1000 #ndatos
-x1<-floor(runif(n,0,3)) #genotypes
-x2<-floor(runif(n,0,3)) #genotypes
-beta1<-rnorm(1,10,10) #allele subst effects
-beta2<-rnorm(1,10,10) #allele subst effects
+p=10   #covariates
+x1<-floor(runif(n,0,3)) #simulate genotypes
+        X<-matrix(nrow=n,ncol=p,NA)
+        for(i in 1:p){X[,i]<-floor(runif(n)*3 )}
+
+beta<-rep(0,p)
+
+beta[1]<-rnorm(1,10,10) #allele subst effects
+beta[3]<-rnorm(1,10,10) #allele subst effects
+beta[7]<-rnorm(1,10,10) #allele subst effects
 mu=20
-y<-mu+beta1*x1+beta2*x2+rnorm(n,0,sd=50) #generate data
+y<-mu+X%*%beta+rnorm(n,0,sd=50) #generate data
 plot(x,y)
-X<-as.matrix(cbind(x1,x2))
 ```
 
 Now we can perform the Bayesian regression of the phenotype *y* on the covariates with the *br function*
