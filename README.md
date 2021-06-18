@@ -27,9 +27,9 @@ mu=20
 y<-mu+X%*%beta+rnorm(n,0,sd=50) #generate data
 ```
 
-Now we can perform the Bayesian regression of the phenotype *y* on the covariates with the *br function*
+Now we can perform the Bayesian regression of the phenotype *y* on the covariates with the *br function*, and (optional) hyperparameteres for a priori residual variance of v=10 and S=2500. (Default values are v=1 and S=1 if no hyperparameters are provided).
 ```r
-fit<-br(y,X,niter=10000,burnin=1000,permutation = F)
+fit<-br(y,X,niter=10000,burnin=1000,permutation = F,v0=10,S0=2500)
 ```
 
 you can check the results as
