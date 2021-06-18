@@ -25,7 +25,6 @@ beta[3]<-rnorm(1,10,10) #allele subst effects
 beta[7]<-rnorm(1,10,10) #allele subst effects
 mu=20
 y<-mu+X%*%beta+rnorm(n,0,sd=50) #generate data
-plot(x,y)
 ```
 
 Now we can perform the Bayesian regression of the phenotype *y* on the covariates with the *br function*
