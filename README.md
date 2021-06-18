@@ -60,7 +60,7 @@ plot(fit$ve,type="l")
 
 You can also perform a Bayesian permutation test on the data with the same model
 ```r
-fit.perm<-br(y,X,niter=10000,burnin=1000,permutation = T)
+fit.perm<-br(y,X,niter=10000,burnin=1000,permutation = T,v0=10,S0=2500)
 ```
 
 Then we obtain the overlapping proportion between the posterior distribution of all covariates from the original model and the permutated model using the *getOverlapping function*.
