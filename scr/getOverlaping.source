@@ -1,14 +1,15 @@
 
 getOverlapping<-function(model, perm){
-    min.value=min( c(model$beta_pd[(model$burnin+1):model$niter,factor], perm$beta_pd[(perm$burnin+1):perm$niter,factor]) )
-    max.value=max( c(model$beta_pd[(model$burnin+1):model$niter,factor], perm$beta_pd[(perm$burnin+1):perm$niter,factor]) )
-    
-    d2dens<-apply(perm$beta_pd[(burnin+1):niter,], 2, density,from = min.value,to=max.value)
-    d1dens<-apply(model$beta_pd[(burnin+1):niter,], 2, density,from = min.value,to=max.value)
-    
     joint<-list()
     overlapping<-vector(length=dim(model$beta_pd)[2])
     for (factor in 1:dim(model$beta_pd)[2]){
+        min.value=min( c(model$beta_pd[(model$burnin+1):model$niter,factor], perm$beta_pd[(perm$burnin+1):perm$niter,factor]) )
+        max.value=max( c(model$beta_pd[(model$burnin+1):model$niter,factor], perm$beta_pd[(perm$burnin+1):perm$niter,factor]) )
+    
+        d2dens<-apply(perm$beta_pd[(burnin+1):niter,], 2, density,from = min.value,to=max.value)
+        d1dens<-apply(model$beta_pd[(burnin+1):niter,], 2, density,from = min.value,to=max.value)
+    
+
         print (factor)
         joint[[factor]] <- pmin(d1dens[[factor]]$y, d2dens[[factor]]$y)
         overlapping[factor]<-.5*sum(joint[[factor]]) / sum(d1dens[[factor]]$y)
