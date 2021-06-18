@@ -1,5 +1,5 @@
 
-br<-function(y,X,niter=1000,burnin=100,permutation=T)
+br<-function(y,X,niter=1000,burnin=100,permutation=T,v0=1,S0=1)
 {
     welcome<-function(){
         cat("===  Naive Bayesian regression with posible permutation analyses=======")
@@ -56,7 +56,7 @@ br<-function(y,X,niter=1000,burnin=100,permutation=T)
         }
         #sample from conditional distribution for residual variance
         sse<-sum(residuals**2)
-        ve[iter]<-1/rgamma(1,shape=(n)/2,rate =(sse)/2)
+        ve[iter]<-1/rgamma(1,shape=(n+v0)/2,rate =(sse+S0)/2)
     }
     
     
